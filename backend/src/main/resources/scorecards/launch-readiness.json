@@ -1,0 +1,103 @@
+{
+  "id": "launch-readiness",
+  "version": "1.0",
+  "name": "Web App Launch Readiness",
+  "description": "Checks whether a web application is ready for real users: product, performance, operations and compliance.",
+  "branding": {
+    "organization": "Scorecard Studio · Demo",
+    "tagline": "Go-live checklist",
+    "logoText": "LaunchPad",
+    "primaryColor": "#0f766e",
+    "accentColor": "#b45309"
+  },
+  "thresholds": [
+    { "id": "not-ready", "label": "Not ready", "min": 0, "color": "#b91c1c",
+      "summary": "Launching now would likely mean outages or support issues in the first weeks." },
+    { "id": "almost", "label": "Almost there", "min": 60, "color": "#ca8a04",
+      "summary": "Most of the work is done. Close the remaining gaps before announcing the launch." },
+    { "id": "ready", "label": "Ready to launch", "min": 85, "color": "#15803d",
+      "summary": "The application looks ready for real users. Keep monitoring closely during launch week." }
+  ],
+  "categories": [
+    {
+      "id": "product",
+      "name": "Product",
+      "description": "Core flows, testing and feedback.",
+      "weight": 1,
+      "recommendations": {
+        "not-ready": "Finish and test the main user journeys end to end before anything else.",
+        "almost": "Run a short beta with real users and fix the top issues they report.",
+        "ready": "Prepare a simple way for users to report problems after launch."
+      },
+      "questions": [
+        { "id": "core-flows", "label": "Share of core user journeys that are complete and tested", "type": "NUMBER", "unit": "%",
+          "min": 0, "max": 100, "required": true,
+          "bands": [ { "to": 50, "score": 10 }, { "from": 50, "to": 80, "score": 50 }, { "from": 80, "to": 100, "score": 85 }, { "from": 100, "score": 100 } ] },
+        { "id": "beta-users", "label": "Has the app been tried by real users outside the team?", "type": "YES_NO", "required": true },
+        { "id": "open-bugs", "label": "How many known critical bugs are still open?", "type": "NUMBER", "min": 0, "max": 1000, "required": true,
+          "bands": [ { "to": 1, "score": 100 }, { "from": 1, "to": 3, "score": 50 }, { "from": 3, "score": 0 } ] }
+      ]
+    },
+    {
+      "id": "performance",
+      "name": "Performance",
+      "description": "Speed and behaviour under load.",
+      "weight": 0.75,
+      "recommendations": {
+        "not-ready": "Measure page load and API response times; fix anything above a few seconds.",
+        "almost": "Load-test the busiest endpoints with expected launch traffic.",
+        "ready": "Set up alerts on response times so regressions are caught early."
+      },
+      "questions": [
+        { "id": "load-time", "label": "Typical page load time", "type": "NUMBER", "unit": "seconds", "min": 0, "max": 120, "required": true,
+          "bands": [ { "to": 2, "score": 100 }, { "from": 2, "to": 4, "score": 60 }, { "from": 4, "score": 15 } ] },
+        { "id": "load-tested", "label": "Has the app been load-tested?", "type": "YES_NO", "required": false }
+      ]
+    },
+    {
+      "id": "operations",
+      "name": "Operations",
+      "description": "Deployment, monitoring and backups.",
+      "weight": 1.25,
+      "recommendations": {
+        "not-ready": "Automate deployment and add basic uptime monitoring before go-live.",
+        "almost": "Add error tracking and confirm database backups can actually be restored.",
+        "ready": "Write a short runbook for the most likely incidents."
+      },
+      "questions": [
+        { "id": "deployment", "label": "How is the application deployed?", "type": "CHOICE", "required": true,
+          "options": [
+            { "value": "ci-cd", "label": "Automated pipeline", "score": 100 },
+            { "value": "scripted", "label": "Scripted, run manually", "score": 70 },
+            { "value": "manual", "label": "Manual steps", "score": 25 }
+          ] },
+        { "id": "monitoring", "label": "How complete is monitoring (uptime, errors, logs)?", "type": "SCALE", "min": 0, "max": 4,
+          "minLabel": "None", "maxLabel": "Full coverage", "required": true },
+        { "id": "db-backups", "label": "Are database backups automated?", "type": "YES_NO", "required": true }
+      ]
+    },
+    {
+      "id": "compliance",
+      "name": "Security & Compliance",
+      "description": "Legal pages, data handling and basic security.",
+      "weight": 1,
+      "recommendations": {
+        "not-ready": "Add a privacy policy, enforce HTTPS and review who can access production data.",
+        "almost": "Run a basic security review of authentication and input validation.",
+        "ready": "Schedule a periodic dependency and security update review."
+      },
+      "questions": [
+        { "id": "https", "label": "Is HTTPS enforced everywhere?", "type": "YES_NO", "required": true },
+        { "id": "privacy-policy", "label": "Is a privacy policy published?", "type": "YES_NO", "required": true },
+        { "id": "security-review", "label": "How thoroughly has security been reviewed?", "type": "SCALE", "min": 1, "max": 5,
+          "minLabel": "Not reviewed", "maxLabel": "External review", "required": true },
+        { "id": "launch-notes", "label": "Launch notes", "type": "TEXT", "required": false }
+      ]
+    }
+  ],
+  "report": {
+    "title": "Launch Readiness Scorecard",
+    "intro": "A one-page view of how ready this application is for real users, scored per area against the launch checklist configuration.",
+    "footer": "Generated with Scorecard Studio. Scores reflect the answers provided."
+  }
+}

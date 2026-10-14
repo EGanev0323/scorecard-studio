@@ -1,0 +1,114 @@
+{
+  "id": "security-readiness",
+  "version": "1.0",
+  "name": "Small Business Security Readiness",
+  "description": "A quick self-assessment of how well a small team protects its accounts, data and devices, with practical next steps per area.",
+  "branding": {
+    "organization": "Scorecard Studio · Demo",
+    "tagline": "Security readiness assessment",
+    "logoText": "SecureCheck",
+    "primaryColor": "#1e3a8a",
+    "accentColor": "#0369a1"
+  },
+  "thresholds": [
+    { "id": "high-risk", "label": "High risk", "min": 0, "color": "#dc2626",
+      "summary": "Several basic protections are missing. An attacker would not need advanced skills to cause real damage." },
+    { "id": "moderate", "label": "Moderate risk", "min": 55, "color": "#d97706",
+      "summary": "The foundations are in place, but there are gaps that are worth closing before they are tested by an incident." },
+    { "id": "protected", "label": "Well protected", "min": 80, "color": "#16a34a",
+      "summary": "Strong baseline. Focus on keeping these practices consistent as the team and tooling grow." }
+  ],
+  "categories": [
+    {
+      "id": "identity",
+      "name": "Accounts & Access",
+      "description": "Who can sign in to what, and how well those accounts are protected.",
+      "weight": 1.5,
+      "recommendations": {
+        "high-risk": "Turn on multi-factor authentication for email and admin accounts first, then remove shared logins.",
+        "moderate": "Extend MFA to every business system and review who still has admin rights they no longer need.",
+        "protected": "Review access quarterly and remove accounts on the same day someone leaves."
+      },
+      "questions": [
+        { "id": "mfa", "label": "Is multi-factor authentication enabled for email and admin accounts?", "type": "YES_NO", "required": true, "weight": 2 },
+        { "id": "shared-accounts", "label": "Do people share logins for business tools?", "type": "YES_NO", "required": true, "invert": true },
+        { "id": "password-manager", "label": "How consistently does the team use a password manager?", "type": "SCALE", "min": 1, "max": 5,
+          "minLabel": "Nobody", "maxLabel": "Everyone, for everything", "required": true },
+        { "id": "offboarding", "label": "When someone leaves, how quickly is their access removed?", "type": "CHOICE", "required": true,
+          "options": [
+            { "value": "same-day", "label": "The same day", "score": 100 },
+            { "value": "week", "label": "Within a week", "score": 60 },
+            { "value": "eventually", "label": "Eventually / when noticed", "score": 20 },
+            { "value": "never", "label": "We do not have a process", "score": 0 }
+          ] }
+      ]
+    },
+    {
+      "id": "data",
+      "name": "Data Protection",
+      "description": "Backups and how sensitive information is stored and shared.",
+      "weight": 1.25,
+      "recommendations": {
+        "high-risk": "Set up automatic backups with one copy kept offline, and test a restore this month.",
+        "moderate": "Test restores on a schedule and move sensitive files out of personal accounts.",
+        "protected": "Document your backup and retention policy so it survives staff changes."
+      },
+      "questions": [
+        { "id": "backup-frequency", "label": "How often are business-critical files backed up?", "type": "CHOICE", "required": true,
+          "options": [
+            { "value": "daily", "label": "Daily or continuously", "score": 100 },
+            { "value": "weekly", "label": "Weekly", "score": 65 },
+            { "value": "monthly", "label": "Monthly", "score": 30 },
+            { "value": "none", "label": "No regular backups", "score": 0 }
+          ] },
+        { "id": "restore-test-days", "label": "How many days ago did you last test restoring a backup?", "type": "NUMBER", "unit": "days",
+          "min": 0, "max": 3650, "required": true,
+          "bands": [
+            { "to": 31, "score": 100 },
+            { "from": 31, "to": 91, "score": 70 },
+            { "from": 91, "to": 366, "score": 35 },
+            { "from": 366, "score": 0 }
+          ] },
+        { "id": "encryption", "label": "Are laptops and phones with business data encrypted?", "type": "YES_NO", "required": true }
+      ]
+    },
+    {
+      "id": "devices",
+      "name": "Devices & Updates",
+      "description": "Keeping laptops, phones and software patched and protected.",
+      "weight": 1,
+      "recommendations": {
+        "high-risk": "Enable automatic updates on every device and remove software that is no longer supported.",
+        "moderate": "Keep an inventory of devices so nothing is left unpatched or unmanaged.",
+        "protected": "Keep doing this. Consider central device management as the team grows."
+      },
+      "questions": [
+        { "id": "auto-updates", "label": "How reliably are operating system and browser updates installed?", "type": "SCALE", "min": 1, "max": 5,
+          "minLabel": "Rarely", "maxLabel": "Automatically", "required": true },
+        { "id": "inventory", "label": "Do you keep a list of all devices used for work?", "type": "YES_NO", "required": false }
+      ]
+    },
+    {
+      "id": "incident",
+      "name": "Incident Readiness",
+      "description": "Knowing what to do when something goes wrong.",
+      "weight": 1,
+      "recommendations": {
+        "high-risk": "Write a one-page plan: who to call, how to lock accounts, and where backups live.",
+        "moderate": "Run a short phishing-awareness session and walk through the plan once with the team.",
+        "protected": "Rehearse the plan yearly and update contacts after any team change."
+      },
+      "questions": [
+        { "id": "incident-plan", "label": "Is there a written plan for a security incident?", "type": "YES_NO", "required": true },
+        { "id": "phishing-training", "label": "How confident is the team at spotting phishing emails?", "type": "SCALE", "min": 1, "max": 5,
+          "minLabel": "Not at all", "maxLabel": "Very confident", "required": true },
+        { "id": "notes", "label": "Anything else the assessor should know?", "type": "TEXT", "required": false }
+      ]
+    }
+  ],
+  "report": {
+    "title": "Security Readiness Scorecard",
+    "intro": "This scorecard summarises the answers given in the self-assessment. Each area is scored from 0 to 100 using the rules defined in the assessment configuration, with a recommended next step for each.",
+    "footer": "Generated with Scorecard Studio. Self-assessment only; not a substitute for a professional security audit."
+  }
+}

@@ -1,0 +1,36 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: scorecard
+      POSTGRES_USER: scorecard
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-scorecard}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U scorecard -d scorecard"]
+      interval: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/scorecard
+      DB_USER: scorecard
+      DB_PASSWORD: ${DB_PASSWORD:-scorecard}
+      SCORECARD_EXTRA_TEMPLATES: file:/config/scorecards/*.json
+    volumes:
+      - ./config/scorecards:/config/scorecards:ro
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "8081:80"
+    depends_on:
+      - backend
+
+volumes:
+  db-data:

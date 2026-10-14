@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title th:text="${t.report.title}">Scorecard</title>
+    <!-- Colors are inlined unescaped; TemplateValidator only allows strict #rrggbb values. -->
+    <style th:inline="css">
+        @page { size: A4; margin: 14mm 15mm 16mm 15mm;
+            @bottom-center { content: element(footer); } }
+        body { font-family: 'Report Sans', sans-serif; font-size: 9.5pt; color: #1f2937; margin: 0; }
+        .footer { position: running(footer); font-size: 7.5pt; color: #6b7280; text-align: center; }
+        .banner { background: [(${t.branding.primaryColor})]; color: #ffffff; padding: 14px 18px; border-radius: 6px; }
+        .banner table { width: 100%; border-collapse: collapse; }
+        .logo { font-size: 15pt; font-weight: 700; letter-spacing: 0.5px; }
+        .tagline { font-size: 8pt; color: #dbeafe; }
+        .meta { text-align: right; font-size: 8pt; line-height: 1.5; }
+        h1 { font-size: 17pt; margin: 12px 0 4px 0; color: #111827; }
+        .intro { color: #4b5563; margin: 0 0 14px 0; line-height: 1.45; }
+        .summary { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+        .summary td { vertical-align: middle; }
+        .gauge { width: 86px; height: 86px; border-radius: 49px; border: 6px solid #e5e7eb; text-align: center; }
+        .gauge-score { font-size: 24pt; font-weight: 700; padding-top: 18px; line-height: 1.1; }
+        .gauge-max { font-size: 8pt; color: #6b7280; }
+        .status-pill { display: inline-block; color: #ffffff; font-weight: 700; padding: 3px 10px; border-radius: 10px; font-size: 9pt; }
+        .status-summary { margin-top: 6px; color: #374151; line-height: 1.45; }
+        .respondent { margin-top: 6px; font-size: 8.5pt; color: #6b7280; }
+        .cats { width: 100%; border-collapse: collapse; }
+        .cats th { text-align: left; font-size: 7.5pt; text-transform: uppercase; letter-spacing: 0.6px; color: #6b7280; border-bottom: 1px solid #e5e7eb; padding: 6px 4px; }
+        .cats td { border-bottom: 1px solid #f1f5f9; padding: 6px 4px; vertical-align: top; }
+        .cat-name { font-weight: 700; color: #111827; }
+        .cat-desc { font-size: 8pt; color: #6b7280; margin-top: 2px; }
+        .bar { background: #eef2f7; height: 8px; border-radius: 4px; margin-top: 4px; }
+        .bar-fill { height: 8px; border-radius: 4px; }
+        .score { font-weight: 700; font-size: 11pt; text-align: right; }
+        .reco { font-size: 8.5pt; line-height: 1.4; color: #374151; }
+        .legend { margin-top: 10px; font-size: 8pt; color: #4b5563; }
+        .legend span.dot { display: inline-block; width: 8px; height: 8px; border-radius: 4px; margin-right: 4px; }
+        h2 { font-size: 10pt; text-transform: uppercase; letter-spacing: 0.6px; margin: 12px 0 4px 0; }
+        .answers { width: 100%; border-collapse: collapse; font-size: 7.5pt; }
+        .answers td { padding: 2px 4px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+        .answers .cat { color: #6b7280; width: 19%; }
+        .answers .val { font-weight: 700; width: 20%; }
+        .accent { color: [(${t.branding.accentColor})]; }
+    </style>
+</head>
+<body>
+<div class="footer">
+    <span th:text="${t.report.footer}">Footer</span>
+    <span> · Scorecard </span><span th:text="${#strings.substring(s.id.toString(), 0, 8)}">id</span>
+</div>
+
+<div class="banner">
+    <table>
+        <tr>
+            <td>
+                <div class="logo" th:text="${t.branding.logoText}">LOGO</div>
+                <div class="tagline" th:text="${t.branding.tagline}">Tagline</div>
+            </td>
+            <td class="meta">
+                <div th:text="${t.branding.organization}">Organization</div>
+                <div th:text="${date}">Date</div>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<h1 th:text="${t.report.title}">Report title</h1>
+<p class="intro" th:text="${t.report.intro}">Intro</p>
+
+<table class="summary">
+    <tr>
+        <td style="width: 120px;">
+            <div class="gauge" th:style="${r.status != null} ? 'border-color:' + ${r.status.color} : ''">
+                <div class="gauge-score" th:text="${r.overallScore}">72</div>
+                <div class="gauge-max">out of 100</div>
+            </div>
+        </td>
+        <td>
+            <span class="status-pill" th:if="${r.status != null}"
+                  th:style="'background:' + ${r.status.color}" th:text="${r.status.label}">Status</span>
+            <div class="status-summary" th:if="${r.status != null}" th:text="${r.status.summary}">Summary</div>
+            <div class="respondent">
+                Prepared for <strong th:text="${s.respondentName}">Name</strong><span th:if="${s.respondentOrg != null}">, <span th:text="${s.respondentOrg}">Org</span></span>
+                <span> · </span><span th:text="${r.answeredQuestions + ' of ' + r.totalQuestions}">x of y</span> scored questions answered
+            </div>
+        </td>
+    </tr>
+</table>
+
+<table class="cats">
+    <thead>
+    <tr>
+        <th style="width: 38%;">Category</th>
+        <th style="width: 10%; text-align: right;">Score</th>
+        <th>Recommendation</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="c : ${r.categories}">
+        <td>
+            <div class="cat-name" th:text="${c.name}">Category</div>
+            <div class="cat-desc" th:text="${t.category(c.id).get().description}">Description</div>
+            <div class="bar">
+                <div class="bar-fill" th:if="${c.score != null}"
+                     th:style="'width:' + ${c.score} + '%;background:' + ${c.status.color}"></div>
+            </div>
+        </td>
+        <td class="score" th:text="${c.score != null} ? ${c.score} : '–'"
+            th:style="${c.status != null} ? 'color:' + ${c.status.color} : ''">80</td>
+        <td class="reco">
+            <span th:if="${c.status != null}" th:style="'font-weight:700;color:' + ${c.status.color}" th:text="${c.status.label + ': '}">Status: </span>
+            <span th:text="${c.recommendation != null} ? ${c.recommendation} : 'No recommendation configured for this result.'">Recommendation</span>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<h2 class="accent">Responses</h2>
+<table class="answers">
+    <tr th:each="a : ${answers}">
+        <td class="cat" th:text="${a.category}">Category</td>
+        <td th:text="${a.question}">Question</td>
+        <td class="val" th:text="${a.answer}">Answer</td>
+    </tr>
+</table>
+
+<div class="legend">
+    <span th:each="th : ${t.thresholds}" style="margin-right: 14px;">
+        <span class="dot" th:style="'background:' + ${th.color}"></span><span th:text="${th.label + ' (' + #numbers.formatInteger(th.min, 1) + '+)'}">Band</span>
+    </span>
+</div>
+</body>
+</html>

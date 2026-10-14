@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: scorecard-studio
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/scorecard}
+    username: ${DB_USER:scorecard}
+    password: ${DB_PASSWORD:scorecard}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+  jackson:
+    default-property-inclusion: non_null
+
+server:
+  error:
+    include-stacktrace: never
+    include-message: never
+
+scorecard:
+  seed-demo-data: ${SEED_DEMO_DATA:true}
+  template-locations:
+    - classpath:scorecards/*.json
+    - ${SCORECARD_EXTRA_TEMPLATES:file:./config/scorecards/*.json}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+springdoc:
+  swagger-ui:
+    path: /api/docs
+  api-docs:
+    path: /api/openapi
